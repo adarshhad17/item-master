@@ -1,7 +1,7 @@
 import { Outlet, createRootRoute } from "@tanstack/react-router";
 import React from "react";
 import Navbar from "../components/Layout/Navbar";
-import NotFoundPage from "../pages/Notfound";
+import NotFoundPage from "../pages/NotFound";
 
 export const Route = createRootRoute({
   component: () => (
