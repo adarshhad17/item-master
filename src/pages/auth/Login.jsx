@@ -22,7 +22,7 @@ export default function LoginPage() {
 
       if (data.isSuccessful) {
         login(data.token);
-        navigate({ to: "/dashboard" });
+        navigate({ to: "/dashboard/items" });
       }
     } catch (err) {
       console.log(err);
@@ -37,7 +37,6 @@ export default function LoginPage() {
       px-4 py-10
       bg-linear-to-br from-black via-[#0a1627] to-[#12345a]"
     >
-      {/* Card container */}
       <div
         className="
           w-full max-w-sm sm:max-w-md
@@ -62,7 +61,6 @@ export default function LoginPage() {
           Login
         </h1>
 
-        {/* Form */}
         <Form layout="vertical" onFinish={onFinish} className="space-y-4">
           {/* Username */}
           <Form.Item

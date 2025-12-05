@@ -3,15 +3,25 @@ import { Button } from "antd";
 
 export default function ItemsHeader({ onAdd }) {
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 w-full">
+      {/* Title */}
       <h1 className="text-3xl font-bold tracking-wide text-blue-400">
         🛒 Item Master
       </h1>
 
+      {/* Add Button */}
       <Button
         type="primary"
-        className="!bg-blue-600 hover:!bg-blue-500 px-6 py-1 rounded-xl font-medium w-full sm:w-auto"
         onClick={onAdd}
+        className="
+          bg-blue-600! 
+          hover:bg-blue-500!
+          px-6 py-2 
+          rounded-xl 
+          font-medium 
+          shadow 
+          w-full sm:w-auto
+        "
       >
         + Add Item
       </Button>

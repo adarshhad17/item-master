@@ -3,62 +3,67 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRightOutlined } from "@ant-design/icons";
 
 export default function DashboardHome() {
-  const isLoggedIn = !!sessionStorage.getItem("token");
+  const isLoggedIn = Boolean(sessionStorage.getItem("token"));
 
   return (
-    <div
-      className="min-h-screen w-full flex items-center justify-center 
-      px-4 py-10 bg-linear-to-br 
-      from-black via-[#0b0b14] to-[#1b1430]"
-    >
-      <div className="text-center max-w-[90%] sm:max-w-[500px]">
+    <div className="
+      relative min-h-screen w-full flex items-center justify-center
+      px-6 py-12 overflow-hidden bg-[#0A0A12]
+    ">
+      <div className="
+        absolute inset-0 -z-10 blur-[140px] opacity-35
+        bg-linear-to-br from-[#4f29ff] via-[#7133ff] to-[#ff9f80]
+      "></div>
 
-        <h1
-          className="
-            font-extrabold
-            text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl
-            bg-linear-to-r from-[#9a7eff] via-[#cbb0ff] to-[#f5e09a]
-            bg-clip-text text-transparent
-            drop-shadow-[0_0_14px_rgba(220,200,255,0.35)]
-            leading-tight
-          "
-        >
-          {isLoggedIn ? "Dashboard" : "Welcome Back"}
+      <div className="
+        text-center max-w-[95%] sm:max-w-[600px]
+        bg-white/5 backdrop-blur-xl border border-white/10
+        rounded-2xl p-10 shadow-[0_0_40px_rgba(120,70,255,0.25)]
+        animate-fade-in
+      ">
+        <h1 className="
+          font-extrabold leading-tight
+          text-4xl sm:text-5xl md:text-6xl
+          bg-linear-to-r from-[#c6baff] via-[#f3e9ff] to-[#ffddb1]
+          bg-clip-text text-transparent
+        ">
+          {isLoggedIn ? "Dashboard" : "Welcome Back ✨"}
         </h1>
 
-        <p
-          className="
-            mt-4 text-[#e6e1fa]
-            text-base sm:text-lg md:text-xl lg:text-2xl tracking-wide
-          "
-        >
+        <p className="mt-4 text-[#E8E6FF]/85 tracking-wide text-lg sm:text-xl">
           {isLoggedIn
-            ? "Explore your dashboard"
-            : "Let's continue your journey"}
+            ? "Manage your items, sales, and inventory easily."
+            : "Sign in and continue your productivity journey 🚀"}
         </p>
 
         <Link
-          to={isLoggedIn ? "/dashboard" : "/login"}
+          to={isLoggedIn ? "/dashboard/items" : "/login"}
           className="
-            mt-10 inline-flex items-center gap-3 
-            text-transparent bg-clip-text
-            bg-linear-to-r from-[#b39aff] via-[#e7d4ff] to-[#f5e09a]
-            text-xl sm:text-2xl md:text-3xl font-bold
-            hover:opacity-80 transition-all duration-200
-            drop-shadow-[0_0_10px_rgba(230,210,255,0.35)]
+            mt-10 inline-flex items-center gap-3 font-semibold
+            text-lg sm:text-xl px-6 py-3 rounded-xl
+            bg-linear-to-r from-[#744bfa] via-[#8d68ff] to-[#ffb27a]
+            text-white shadow-lg shadow-[#744bfa]/40
+            transition-all duration-300
+            hover:scale-[1.05] hover:shadow-xl hover:shadow-[#8d68ff]/60
           "
         >
-          {isLoggedIn ? "Go to Dashboard" : "Login"}
-          <ArrowRightOutlined
-            className="
-              text-2xl md:text-3xl 
-              text-transparent bg-clip-text
-              bg-linear-to-r from-[#b39aff] via-[#e7d4ff] to-[#f5e09a]
-            "
-          />
-        </Link>
+          {isLoggedIn ? "Go to Items" : "Login"}
 
+          <ArrowRightOutlined className="text-2xl" />
+        </Link>
       </div>
+
+      <style>
+        {`
+          @keyframes fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+          .animate-fade-in {
+            animation: fade-in 1s ease forwards;
+          }
+        `}
+      </style>
     </div>
   );
 }

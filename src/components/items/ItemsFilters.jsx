@@ -11,42 +11,26 @@ export default function ItemsFilters({
   setCategoryId,
   setPage,
 }) {
-
-  // DEBUG: show real API data
+  // DEBUG
   useEffect(() => {
     console.log("INIT DATA RAW >>>", initData);
   }, [initData]);
 
-  // SUPPORT BOTH root and nested .data
-  const source = initData?.data || initData || {};
+  const src = initData?.data || initData || {};
 
-  // FIND CATEGORY ARRAY
+  // ITEM TYPE DATA SOURCE
+  const itemTypeList = src.itemType || src.itemTypes || [];
+
+  // CATEGORY DATA SOURCE
   const categoryList =
-    Object.values(source).find(
-      (v) =>
-        Array.isArray(v) &&
-        v.length &&
-        (v[0].name ||
-          v[0].Name ||
-          v[0].categoryName ||
-          v[0].CategoryName)
-    ) || [];
-
-  // FIND ITEM TYPE ARRAY
-  const itemTypeList =
-    Object.values(source).find(
-      (v) =>
-        Array.isArray(v) &&
-        v.length &&
-        (v[0].text ||
-          v[0].Text ||
-          v[0].itemTypeName ||
-          v[0].ItemTypeName)
-    ) || [];
+    src.itemCategory ||
+    src.categories ||
+    src.category ||
+    [];
 
   return (
     <div className="flex flex-wrap gap-4">
-      
+
       {/* SEARCH */}
       <Search
         placeholder="Search by item name..."
@@ -68,19 +52,20 @@ export default function ItemsFilters({
         allowClear
         className="w-full sm:w-56"
         onChange={(v) => {
-          setItemType(v || undefined);
+          if (v === "ALL") {
+            setItemType(undefined);  // RESET FILTER
+          } else {
+            setItemType(v || undefined);
+          }
           setPage(1);
         }}
       >
-        {itemTypeList.map((it, i) => (
-          <Option
-            key={i}
-            value={it.value || it.Value || it.id || it.ID}
-          >
-            {it.text ||
-              it.Text ||
-              it.itemTypeName ||
-              it.ItemTypeName}
+        {/* ADD THIS */}
+        <Option value="ALL">All</Option>
+
+        {itemTypeList?.map((it) => (
+          <Option key={it.code || it.value} value={it.code || it.value}>
+            {it.name || it.text}
           </Option>
         ))}
       </Select>
@@ -91,19 +76,20 @@ export default function ItemsFilters({
         allowClear
         className="w-full sm:w-56"
         onChange={(v) => {
-          setCategoryId(v ? Number(v) : undefined);
+          if (v === "ALL") {
+            setCategoryId(undefined); // RESET FILTER
+          } else {
+            setCategoryId(v ? Number(v) : undefined);
+          }
           setPage(1);
         }}
       >
-        {categoryList.map((c, i) => (
-          <Option
-            key={i}
-            value={c.id || c.ID}
-          >
-            {c.name ||
-              c.Name ||
-              c.categoryName ||
-              c.CategoryName}
+        {/* ADD THIS */}
+        <Option value="ALL">All</Option>
+
+        {categoryList?.map((c) => (
+          <Option key={c.id || c.value} value={c.id || c.value}>
+            {c.name || c.text}
           </Option>
         ))}
       </Select>

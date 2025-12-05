@@ -32,21 +32,21 @@ export default function ItemsTable({
       dataIndex: "unitID",
       width: 100,
       render: (id) =>
-        initData?.data?.units?.find((u) => u.value === id)?.text || id,
+        initData?.data?.unit?.find((u) => u.id === id)?.name || id,
     },
     {
       title: "Brand",
       dataIndex: "brandID",
       width: 120,
       render: (id) =>
-        initData?.data?.brands?.find((b) => b.value === id)?.text || id,
+        initData?.data?.itemBrand?.find((b) => b.id === id)?.name || id,
     },
     {
       title: "Category",
       dataIndex: "itemCategoryID",
       width: 160,
       render: (id) =>
-        initData?.data?.categories?.find((c) => c.id === id)?.name || id,
+        initData?.data?.itemCategory?.find((c) => c.id === id)?.name || id,
     },
     {
       title: "Actions",
@@ -57,7 +57,7 @@ export default function ItemsTable({
             type="link"
             onClick={() =>
               router.navigate({
-                to: "/dashboard/edit/:id",
+                to: "/dashboard/edit/$id",
                 params: { id: record.itemID },
               })
             }
@@ -79,32 +79,20 @@ export default function ItemsTable({
   ];
 
   return (
-    <div className="bg-[#1e1e1e] p-3 rounded-xl overflow-x-auto">
-      <Table
-        rowKey="itemID"
-        loading={isLoading}
-        columns={columns}
-        dataSource={items}
-        bordered
-        pagination={{
-          current: page,
-          pageSize,
-          total,
-          showSizeChanger: true,
-        }}
-        scroll={{ x: 900 }}
-        onChange={onTableChange}
-        components={{
-          body: {
-            row: (props) => (
-              <tr
-                {...props}
-                className="bg-[#2b2b2b] text-white hover:bg-[#3a3a3a]"
-              />
-            ),
-          },
-        }}
-      />
-    </div>
+    <Table
+      rowKey="itemID"
+      loading={isLoading}
+      columns={columns}
+      dataSource={items}
+      bordered
+      pagination={{
+        current: page,
+        pageSize,
+        total,
+        showSizeChanger: true,
+      }}
+      scroll={{ x: 900 }}
+      onChange={onTableChange}
+    />
   );
 }

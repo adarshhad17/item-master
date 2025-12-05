@@ -9,7 +9,12 @@ export const Route = createFileRoute("/dashboard/")({
       throw redirect({ to: "/login" });
     }
 
-    return {}; // 👈 required for safety
+    // When hit /dashboard -> go to /dashboard/items
+    if (window.location.pathname === "/dashboard") {
+      throw redirect({ to: "/dashboard/items" });
+    }
+
+    return {};
   },
 
   component: DashboardLayout,

@@ -6,8 +6,10 @@ export const Route = createFileRoute("/login")({
     const token = sessionStorage.getItem("token");
 
     if (token) {
-      throw redirect({ to: "/dashboard" });
+      throw redirect({ to: "/dashboard/items" });
     }
+
+    return {};
   },
 
   component: LoginPage,

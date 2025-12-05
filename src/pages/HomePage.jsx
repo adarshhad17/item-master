@@ -4,7 +4,7 @@ import { ArrowRightOutlined } from "@ant-design/icons";
 import { useAuth } from "../store/auth";
 
 export default function HomePage() {
-  const { user, logout } = useAuth(); // check if logged in
+  const { user, logout } = useAuth(); 
 
   return (
     <div

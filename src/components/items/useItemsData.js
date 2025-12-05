@@ -17,23 +17,21 @@ export default function useItemsData() {
   const [categoryId, setCategoryId] = useState();
   const [sorter, setSorter] = useState({});
 
-  // LOAD dropdown data
   const { data: initData } = useQuery({
     queryKey: ["itemInitialize"],
     queryFn: initializeItemForm,
   });
 
-  // LOAD ALL items
   const { data, isLoading } = useQuery({
     queryKey: ["items-all"],
     queryFn: getAllItemsPaged,
   });
 
-  // FILTER + SORT + SEARCH
+  
   const filteredItems = useMemo(() => {
     let list = data?.data || [];
 
-    // SEARCH BY NAME OR CODE
+    // SEARCH
     if (search && search.trim()) {
       const txt = search.toLowerCase();
       list = list.filter(
@@ -43,19 +41,30 @@ export default function useItemsData() {
       );
     }
 
-    // FILTER BY ITEM TYPE
+    // FILTER ITEM TYPE
     if (itemType) {
-      list = list.filter((x) => x.itemType === itemType);
-    }
-
-    // FILTER BY CATEGORY (NUMBER FIX)
-    if (categoryId) {
-      list = list.filter(
-        (x) => Number(x.itemCategoryID) === Number(categoryId)
+      list = list.filter((x) =>
+        [
+          x.itemType,
+          x.itemTypeCode,
+          x.code,
+          x.Value,
+          x.value,
+        ].includes(itemType)
       );
     }
 
-    // SORT
+    // FILTER CATEGORY
+    if (categoryId) {
+      list = list.filter(
+        (x) =>
+          Number(x.itemCategoryID) === Number(categoryId) ||
+          Number(x.categoryId) === Number(categoryId) ||
+          Number(x.CategoryID) === Number(categoryId) ||
+          Number(x.value) === Number(categoryId)
+      );
+    }
+
     if (sorter.field && sorter.order) {
       list = [...list].sort((a, b) => {
         const fa = a[sorter.field];
@@ -69,28 +78,26 @@ export default function useItemsData() {
     return list;
   }, [data, search, itemType, categoryId, sorter]);
 
-  // PAGINATION
   const total = filteredItems.length;
-  const startIndex = (page - 1) * pageSize;
-  const pagedItems = filteredItems.slice(startIndex, startIndex + pageSize);
+  const start = (page - 1) * pageSize;
+  const pagedItems = filteredItems.slice(start, start + pageSize);
 
-  // DELETE
-  const deleteMutation = useMutation({
+  const mutation = useMutation({
     mutationFn: deleteItem,
     onSuccess: (res) => {
       if (!res?.success) {
         message.error(res?.message || "Delete failed");
         return;
       }
+
       message.success("Deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["items-all"] });
       setPage(1);
     },
   });
 
-  const handleDelete = (id) => deleteMutation.mutate(id);
+  const handleDelete = (id) => mutation.mutate(id);
 
-  // TABLE EVENTS
   const onTableChange = (pagination, filters, sort) => {
     setPage(pagination.current);
     setPageSize(pagination.pageSize);

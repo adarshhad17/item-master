@@ -14,12 +14,11 @@ export default function Navbar() {
   const handleLogout = () => {
     logout();
     setOpen(false);
-    navigate({ to: "/login", replace: true }); // 🔥 best practice
+    navigate({ to: "/login", replace: true }); 
   };
 
   return (
     <nav className="w-full bg-[#050505]/95 text-white shadow-lg border-b border-[#1a1a1a] sticky top-0 z-50">
-      {/* TOP BAR */}
       <div className="flex justify-between items-center px-6 py-4">
         {/* LOGO */}
         <Link to="/" className="text-2xl font-bold tracking-wide hover:text-[#a57cff] transition">
@@ -42,7 +41,6 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* MOBILE TOGGLE */}
         <button className="md:hidden text-2xl" onClick={() => setOpen(!open)}>
           {open ? <CloseOutlined /> : <MenuOutlined />}
         </button>

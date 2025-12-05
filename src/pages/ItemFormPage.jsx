@@ -1,162 +1,243 @@
 import React, { useEffect } from "react";
-import { Form, Input, Select, InputNumber, Button, Card, Spin } from "antd";
-import { useRouter, useRouterState } from "@tanstack/react-router";
+import {
+  Form,
+  Input,
+  Select,
+  InputNumber,
+  Button,
+  Card,
+  Spin,
+  message,
+} from "antd";
+import { useRouter, useMatch } from "@tanstack/react-router";
 import useItemForm from "../components/items/useItemForm";
 
 const { Option } = Select;
 
 export default function ItemFormPage() {
   const router = useRouter();
-  const state = useRouterState();
-  const itemId = state?.params?.id;
 
-  const { initialValues, handleSubmit, initData, loading } = useItemForm(
-    itemId,
-    () => router.navigate({ to: "/dashboard/items" })
-  );
+  const match = useMatch({
+    from: "/dashboard/edit/$id",
+    shouldThrow: false,
+  });
+
+  const itemId = match?.params?.id ? Number(match.params.id) : undefined;
+  const isEdit = !!itemId;
 
   const [form] = Form.useForm();
 
-  // Set form values when both initData and initialValues are loaded
-  useEffect(() => {
-    if (initialValues && initData) {
-      form.setFieldsValue(initialValues);
-    }
-  }, [initialValues, initData, form]);
+  const { initData, itemData, loading, saving, save } = useItemForm(
+    itemId,
+    () => {
+      message.success(
+        isEdit ? "Item Updated Successfully" : "Item Created Successfully"
+      );
 
-  if (loading || !initData) {
+      setTimeout(() => {
+        router.navigate({ to: "/dashboard/items" });
+      }, 800);
+    }
+  );
+
+  useEffect(() => {
+    if (!isEdit || !initData || !itemData) return;
+
+    const m = itemData.master || {};
+
+    const formatted = {
+      rowVersion: m.rowVersion,
+      itemName: m.itemName,
+      itemCode: m.itemCode,
+      itemType: m.itemType,
+      unitID: Number(m.unitID),
+      brandID: Number(m.brandID),
+
+      itemDepartmentID: Number(m.itemDepartmentID),
+      itemCategoryID: Number(m.itemCategoryID),
+      itemSubCategoryID: Number(m.itemSubCategoryID),
+      itemGroupID: Number(m.itemGroupID),
+
+      taxID: Number(m.taxID),
+      supplierId: Number(m.supplierId),
+
+      purchaseCost: m.purchaseCost,
+      salesPrice: m.salesPrice,
+    };
+
+    form.setFieldsValue(formatted);
+  }, [isEdit, initData, itemData, form]);
+
+  if (loading)
     return (
       <div className="min-h-screen flex justify-center items-center bg-gray-50">
         <Spin size="large" />
       </div>
     );
-  }
 
-  const isEdit = !!itemId;
+  const handleSubmit = (values) => {
+    const payload = {
+      master: {
+        itemID: itemId || 0,
+        rowVersion: values.rowVersion || "",
+        itemName: values.itemName,
+        itemCode: values.itemCode,
+        brandID: values.brandID,
+        unitID: values.unitID,
+        itemType: values.itemType,
+        taxID: values.taxID,
+        itemGroupID: values.itemGroupID,
+        itemCategoryID: values.itemCategoryID,
+        itemSubCategoryID: values.itemSubCategoryID,
+        itemDepartmentID: values.itemDepartmentID,
+        supplierId: values.supplierId,
+        purchaseCost: values.purchaseCost,
+        salesPrice: values.salesPrice,
+      },
+      itemUnitConversionDetailsData: [],
+    };
+
+    save(payload);
+
+    if (!isEdit) form.resetFields();
+  };
 
   return (
-    <div className="min-h-screen p-6 bg-gray-50 flex justify-center">
+    <div className="min-h-screen p-6 bg-gray-50 flex flex-col items-center">
       <Card className="w-full max-w-5xl shadow-xl border border-gray-200">
         <h2 className="text-2xl font-bold mb-5">
           {isEdit ? "Edit Item" : "Add New Item"}
         </h2>
 
         <Form form={form} layout="vertical" onFinish={handleSubmit}>
-          {/* NAME + CODE */}
+          <Form.Item name="rowVersion" hidden>
+            <Input />
+          </Form.Item>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Form.Item
-              label="Item Name"
-              name="itemName"
-              rules={[{ required: true, message: "Item Name is required" }]}
-            >
-              <Input placeholder="Enter item name" />
+            <Form.Item name="itemName" label="Item Name" rules={[{ required: true }]}>
+              <Input maxLength={50} />
             </Form.Item>
 
-            <Form.Item
-              label="Item Code"
-              name="itemCode"
-              rules={[{ required: true, message: "Item Code is required" }]}
-            >
-              <Input placeholder="Enter item code" />
+            <Form.Item name="itemCode" label="Item Code" rules={[{ required: true }]}>
+              <Input maxLength={20} />
             </Form.Item>
           </div>
 
-          {/* TYPE + UNIT + BRAND */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Form.Item label="Item Type" name="itemType" rules={[{ required: true }]}>
-              <Select placeholder="Select type">
+            <Form.Item name="itemType" label="Item Type" rules={[{ required: true }]}>
+              <Select>
                 {initData.itemType?.map((x) => (
-                  <Option key={x.code} value={x.code}>{x.name}</Option>
+                  <Option key={x.code} value={x.code}>
+                    {x.name}
+                  </Option>
                 ))}
               </Select>
             </Form.Item>
 
-            <Form.Item label="Unit" name="unitID" rules={[{ required: true }]}>
-              <Select placeholder="Select unit">
+            <Form.Item name="unitID" label="Unit" rules={[{ required: true }]}>
+              <Select>
                 {initData.unit?.map((x) => (
-                  <Option key={x.id} value={x.id}>{x.name}</Option>
+                  <Option key={x.id} value={x.id}>
+                    {x.name}
+                  </Option>
                 ))}
               </Select>
             </Form.Item>
 
-            <Form.Item label="Brand" name="brandID" rules={[{ required: true }]}>
-              <Select placeholder="Select brand">
+            <Form.Item name="brandID" label="Brand" rules={[{ required: true }]}>
+              <Select>
                 {initData.itemBrand?.map((x) => (
-                  <Option key={x.id} value={x.id}>{x.name}</Option>
+                  <Option key={x.id} value={x.id}>
+                    {x.name}
+                  </Option>
                 ))}
               </Select>
             </Form.Item>
           </div>
 
-          {/* DEPT + CATEGORY + SUBCATEGORY + GROUP */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Form.Item label="Department" name="itemDepartmentID">
-              <Select placeholder="Select department">
+            <Form.Item name="itemDepartmentID" label="Department">
+              <Select>
                 {initData.itemdepartment?.map((x) => (
-                  <Option key={x.id} value={x.id}>{x.name}</Option>
+                  <Option key={x.id} value={x.id}>
+                    {x.name}
+                  </Option>
                 ))}
               </Select>
             </Form.Item>
 
-            <Form.Item label="Category" name="itemCategoryID">
-              <Select placeholder="Select category">
+            <Form.Item name="itemCategoryID" label="Category">
+              <Select>
                 {initData.itemCategory?.map((x) => (
-                  <Option key={x.id} value={x.id}>{x.name}</Option>
+                  <Option key={x.id} value={x.id}>
+                    {x.name}
+                  </Option>
                 ))}
               </Select>
             </Form.Item>
 
-            <Form.Item label="Sub Category" name="itemSubCategoryID">
-              <Select placeholder="Select subcategory">
+            <Form.Item name="itemSubCategoryID" label="Sub Category">
+              <Select>
                 {initData.itemsubCategory?.map((x) => (
-                  <Option key={x.id} value={x.id}>{x.name}</Option>
+                  <Option key={x.id} value={x.id}>
+                    {x.name}
+                  </Option>
                 ))}
               </Select>
             </Form.Item>
 
-            <Form.Item label="Group" name="itemGroupID">
-              <Select placeholder="Select group">
+            <Form.Item name="itemGroupID" label="Group">
+              <Select>
                 {initData.itemgroup?.map((x) => (
-                  <Option key={x.id} value={x.id}>{x.name}</Option>
+                  <Option key={x.id} value={x.id}>
+                    {x.name}
+                  </Option>
                 ))}
               </Select>
             </Form.Item>
           </div>
 
-          {/* TAX + SUPPLIER */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Form.Item label="Tax" name="taxID">
-              <Select placeholder="Select tax">
+            <Form.Item name="taxID" label="Tax">
+              <Select>
                 {initData.tax?.map((x) => (
-                  <Option key={x.id} value={x.id}>{x.name}</Option>
+                  <Option key={x.id} value={x.id}>
+                    {x.name}
+                  </Option>
                 ))}
               </Select>
             </Form.Item>
 
-            <Form.Item label="Supplier" name="supplierId">
-              <Select placeholder="Select supplier">
+            <Form.Item name="supplierId" label="Supplier">
+              <Select>
                 {initData.supplier?.map((x) => (
-                  <Option key={x.id} value={x.id}>{x.name}</Option>
+                  <Option key={x.id} value={x.id}>
+                    {x.name}
+                  </Option>
                 ))}
               </Select>
             </Form.Item>
           </div>
 
-          {/* COST + PRICE */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Form.Item label="Purchase Cost" name="purchaseCost">
+            <Form.Item name="purchaseCost" label="Purchase Cost">
               <InputNumber style={{ width: "100%" }} min={0} />
             </Form.Item>
 
-            <Form.Item label="Sales Price" name="salesPrice">
+            <Form.Item name="salesPrice" label="Sales Price">
               <InputNumber style={{ width: "100%" }} min={0} />
             </Form.Item>
           </div>
 
-          {/* ACTIONS */}
-          <div className="flex justify-end gap-3 mt-4">
-            <Button onClick={() => router.navigate({ to: "/dashboard/items" })}>Cancel</Button>
-            <Button type="primary" htmlType="submit">{isEdit ? "Update Item" : "Create Item"}</Button>
+          <div className="flex justify-center gap-4 mt-8">
+            <Button onClick={() => router.navigate({ to: "/dashboard/items" })}>
+              Cancel
+            </Button>
+
+            <Button type="primary" htmlType="submit" loading={saving}>
+              {isEdit ? "Update Item" : "Create Item"}
+            </Button>
           </div>
         </Form>
       </Card>
