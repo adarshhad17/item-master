@@ -9,13 +9,6 @@ export default defineConfig({
     tailwindcss(),
     TanStackRouterVite(),
   ],
-
-  base: "./", 
-
-  build: {
-    outDir: "dist",
-  },
-
   server: {
     proxy: {
       "/api": {
