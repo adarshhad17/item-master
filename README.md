@@ -27,3 +27,14 @@ Built using **React**, **Vite**, **Ant Design**, and **TanStack Router**.
 ```bash
 git clone https://github.com/adarshhad17/item-master.git
 cd item-master
+
+
+##Install dependencies
+
+npm install
+
+
+##Run the application
+
+npm run dev
+
