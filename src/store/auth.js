@@ -1,16 +1,16 @@
 import { create } from "zustand";
 
 export const useAuth = create((set) => ({
-  token: localStorage.getItem("token"),  // 👈 FIXED
+  token: sessionStorage.getItem("token"), // read token only for this tab
   user: null,
 
   login: (token) => {
-    localStorage.setItem("token", token);
+    sessionStorage.setItem("token", token); // store for this session only
     set({ token });
   },
 
   logout: () => {
-    localStorage.removeItem("token");
+    sessionStorage.removeItem("token"); // remove on logout
     set({ token: null, user: null });
   },
 }));

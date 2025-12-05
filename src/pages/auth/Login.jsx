@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Form, Input, Button } from "antd";
-import { loginApi } from "../api/authApi";
-import { useAuth } from "../store/auth";
+import { loginApi } from "../../api/authApi";
+import { useAuth } from "../../store/auth";
 import { useNavigate } from "@tanstack/react-router";
 
 export default function LoginPage() {

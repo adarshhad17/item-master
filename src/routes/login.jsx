@@ -1,11 +1,10 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import LoginPage from "../pages/Login";
+import LoginPage from "../pages/auth/Login";
 
 export const Route = createFileRoute("/login")({
   beforeLoad: () => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
-    // If already logged in → redirect to dashboard
     if (token) {
       throw redirect({ to: "/dashboard" });
     }

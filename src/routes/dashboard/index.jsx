@@ -3,12 +3,13 @@ import DashboardLayout from "../../components/Layout/DashboardLayout";
 
 export const Route = createFileRoute("/dashboard/")({
   beforeLoad: () => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
-    // ❌ If no token -> redirect to login
     if (!token) {
       throw redirect({ to: "/login" });
     }
+
+    return {}; // 👈 required for safety
   },
 
   component: DashboardLayout,

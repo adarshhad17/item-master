@@ -1,4 +1,3 @@
-// src/routes/__root.jsx
 import { Outlet, createRootRoute } from "@tanstack/react-router";
 import React from "react";
 import Navbar from "../components/Layout/Navbar";

@@ -17,12 +17,8 @@ export async function getAllItemsPaged({
       search,
       itemType,
       categoryId,
-
-      // 🔥 Correct backend param names for sorting
-      SortColumn: sortField,
-      SortDirection:
-        sortOrder === "asc" ? "ASC" :
-        sortOrder === "desc" ? "DESC" : null,
+      sortField,
+      sortOrder,
     },
   });
 

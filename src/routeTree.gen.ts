@@ -14,7 +14,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardItemsRouteImport } from './routes/dashboard/items'
 import { Route as DashboardCreateRouteImport } from './routes/dashboard/create'
-import { Route as DashboardEditIdRouteImport } from './routes/dashboard/edit.$id'
+import { Route as DashboardEditIdRouteImport } from './routes/dashboard/edit/$id'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
