@@ -230,15 +230,44 @@ export default function ItemFormPage() {
             </Form.Item>
           </div>
 
-          <div className="flex justify-center gap-4 mt-8">
-            <Button onClick={() => router.navigate({ to: "/dashboard/items" })}>
-              Cancel
-            </Button>
+ <div className="flex justify-center gap-4 mt-8">
+  {/* RED CANCEL BUTTON */}
+  <Button
+    htmlType="button"
+    danger
+    style={{
+      height: "40px",
+      width: "120px",
+      fontWeight: "600",
+      borderRadius: "8px",
+      background: "linear-gradient(90deg, #ff4d4f 0%, #b60206 100%)",
+      color: "white",
+      border: "none",
+    }}
+    onClick={() => router.navigate({ to: "/dashboard/items" })}
+  >
+    Cancel
+  </Button>
 
-            <Button type="primary" htmlType="submit" loading={saving}>
-              {isEdit ? "Update Item" : "Create Item"}
-            </Button>
-          </div>
+  {/* BLUE UPDATE / CREATE BUTTON */}
+  <Button
+    type="primary"
+    htmlType="submit"
+    loading={saving}
+    style={{
+      height: "40px",
+      width: "120px",
+      fontWeight: "600",
+      borderRadius: "8px",
+      background: "linear-gradient(90deg, #1890ff 0%, #006ae8 100%)",
+      border: "none",
+    }}
+  >
+    {isEdit ? "Update Item" : "Create Item"}
+  </Button>
+</div>
+
+
         </Form>
       </Card>
     </div>

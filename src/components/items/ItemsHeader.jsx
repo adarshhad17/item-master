@@ -4,12 +4,10 @@ import { Button } from "antd";
 export default function ItemsHeader({ onAdd }) {
   return (
     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 w-full">
-      {/* Title */}
       <h1 className="text-3xl font-bold tracking-wide text-blue-400">
         🛒 Item Master
       </h1>
 
-      {/* Add Button */}
       <Button
         type="primary"
         onClick={onAdd}

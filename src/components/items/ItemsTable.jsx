@@ -79,20 +79,23 @@ export default function ItemsTable({
   ];
 
   return (
-    <Table
-      rowKey="itemID"
-      loading={isLoading}
-      columns={columns}
-      dataSource={items}
-      bordered
-      pagination={{
-        current: page,
-        pageSize,
-        total,
-        showSizeChanger: true,
-      }}
-      scroll={{ x: 900 }}
-      onChange={onTableChange}
-    />
+    // ⬇️ ADDED TOP MARGIN HERE
+    <div className="mt-6">
+      <Table
+        rowKey="itemID"
+        loading={isLoading}
+        columns={columns}
+        dataSource={items}
+        bordered
+        pagination={{
+          current: page,
+          pageSize,
+          total,
+          showSizeChanger: true,
+        }}
+        scroll={{ x: 900 }}
+        onChange={onTableChange}
+      />
+    </div>
   );
 }

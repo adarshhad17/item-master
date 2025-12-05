@@ -29,7 +29,8 @@ export default function ItemsFilters({
     [];
 
   return (
-    <div className="flex flex-wrap gap-4">
+    // ⬇️ ADDED MARGIN BOTTOM HERE
+    <div className="flex flex-wrap gap-4 mb-6">
 
       {/* SEARCH */}
       <Search
@@ -53,14 +54,14 @@ export default function ItemsFilters({
         className="w-full sm:w-56"
         onChange={(v) => {
           if (v === "ALL") {
-            setItemType(undefined);  // RESET FILTER
+            setItemType(undefined); // RESET FILTER
           } else {
             setItemType(v || undefined);
           }
           setPage(1);
         }}
       >
-        {/* ADD THIS */}
+        {/* DEFAULT OPTION */}
         <Option value="ALL">All</Option>
 
         {itemTypeList?.map((it) => (
@@ -84,7 +85,7 @@ export default function ItemsFilters({
           setPage(1);
         }}
       >
-        {/* ADD THIS */}
+        {/* DEFAULT OPTION */}
         <Option value="ALL">All</Option>
 
         {categoryList?.map((c) => (
