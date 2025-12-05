@@ -6,7 +6,6 @@ import {
   InputNumber,
   Button,
   Card,
-  Space,
   Table,
   message,
 } from "antd";
@@ -21,19 +20,18 @@ import { useRouter } from "@tanstack/react-router";
 const { Option } = Select;
 
 export default function ItemFormPage({ itemId }) {
-  const router = useRouter(); // ✅ FIXED
+  const router = useRouter();
   const [form] = Form.useForm();
   const queryClient = useQueryClient();
-
   const [details, setDetails] = useState([]);
 
-  // Fetch dropdown data
+  // Fetch dropdowns
   const { data: initData, isLoading: initLoading } = useQuery({
     queryKey: ["itemInitialize"],
     queryFn: initializeItemForm,
   });
 
-  // Fetch item when editing
+  // Edit mode
   const { data: itemData, isLoading: itemLoading } = useQuery({
     queryKey: ["item", itemId],
     queryFn: () => getItemById(itemId),
@@ -43,20 +41,20 @@ export default function ItemFormPage({ itemId }) {
   // Save mutation
   const saveMutation = useMutation({
     mutationFn: saveItem,
-    onSuccess: (res) => {
-      message.success(res?.message || "Saved successfully");
+    onSuccess: () => {
+      message.success("Saved successfully");
       queryClient.invalidateQueries(["items"]);
-      router.navigate({ to: "/items" }); // ✅ FIXED
+      router.navigate({ to: "/items" });
     },
     onError: (err) => {
       message.error(err.message || "Save failed");
     },
   });
 
-  // Autofill when editing
+  // Autofill on edit
   useEffect(() => {
-    if (itemData?.data?.master) {
-      const m = itemData.data.master;
+    if (itemData?.master) {
+      const m = itemData.master;
 
       form.setFieldsValue({
         itemName: m.itemName,
@@ -74,24 +72,36 @@ export default function ItemFormPage({ itemId }) {
         salesPrice: m.salesPrice,
       });
 
-      setDetails(itemData.data.details || []);
+      setDetails(itemData.itemUnitConversionDetailsData || []);
     }
   }, [itemData]);
 
+  // Submit
   const onFinish = (values) => {
     const master = {
       itemID: itemId || 0,
       ...values,
     };
 
+    const formattedDetails = details.map((d) => ({
+      itemUnitConversionID: d.itemUnitConversionID || 0,
+      itemID: itemId || 0,
+      unitID: d.unitID,
+      conversionFactor: d.conversionFactor || 1,
+      unitType: d.unitType || "",
+      unitBarcode: d.unitBarcode || "",
+      isActive: true,
+    }));
+
     const payload = {
       master,
-      details,
+      itemUnitConversionDetailsData: formattedDetails,
     };
 
     saveMutation.mutate(payload);
   };
 
+  // Dropdown data
   const {
     itemTypes = [],
     units = [],
@@ -104,14 +114,17 @@ export default function ItemFormPage({ itemId }) {
     suppliers = [],
   } = initData?.data || {};
 
+  //---------------------- DETAILS TABLE ----------------------
+
   const addDetail = () => {
     setDetails([
       ...details,
       {
         id: Date.now(),
         unitID: undefined,
-        additionalPrice: 0,
-        additionalCost: 0,
+        conversionFactor: 1,
+        unitType: "",
+        unitBarcode: "",
       },
     ]);
   };
@@ -128,18 +141,18 @@ export default function ItemFormPage({ itemId }) {
     );
   };
 
-  const detailColumns = [
+  const columns = [
     {
       title: "Unit",
       dataIndex: "unitID",
-      render: (value, _, index) => (
+      render: (val, _, index) => (
         <Select
           className="w-full"
-          value={value}
+          value={val}
           onChange={(v) => updateDetail(index, "unitID", v)}
         >
-          {units?.map((u) => (
-            <Option value={u.id} key={u.id}>
+          {units.map((u) => (
+            <Option key={u.id} value={u.id}>
               {u.name}
             </Option>
           ))}
@@ -147,26 +160,38 @@ export default function ItemFormPage({ itemId }) {
       ),
     },
     {
-      title: "Additional Price",
-      dataIndex: "additionalPrice",
-      render: (value, _, index) => (
+      title: "Factor",
+      dataIndex: "conversionFactor",
+      render: (val, _, index) => (
         <InputNumber
-          min={0}
+          min={1}
           className="w-full"
-          value={value}
-          onChange={(v) => updateDetail(index, "additionalPrice", v)}
+          value={val}
+          onChange={(v) => updateDetail(index, "conversionFactor", v)}
         />
       ),
     },
     {
-      title: "Additional Cost",
-      dataIndex: "additionalCost",
-      render: (value, _, index) => (
-        <InputNumber
-          min={0}
-          className="w-full"
-          value={value}
-          onChange={(v) => updateDetail(index, "additionalCost", v)}
+      title: "Unit Type",
+      dataIndex: "unitType",
+      render: (val, _, index) => (
+        <Input
+          value={val}
+          onChange={(e) =>
+            updateDetail(index, "unitType", e.target.value)
+          }
+        />
+      ),
+    },
+    {
+      title: "Barcode",
+      dataIndex: "unitBarcode",
+      render: (val, _, index) => (
+        <Input
+          value={val}
+          onChange={(e) =>
+            updateDetail(index, "unitBarcode", e.target.value)
+          }
         />
       ),
     },
@@ -182,67 +207,130 @@ export default function ItemFormPage({ itemId }) {
 
   const loading = initLoading || itemLoading || saveMutation.isPending;
 
+  //---------------------- RENDER ----------------------
+
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between">
-        <h1 className="text-xl font-semibold">
-          {itemId ? "Edit Item" : "Add Item"}
-        </h1>
+    <Card loading={loading} className="p-6">
+      <Form form={form} layout="vertical" onFinish={onFinish}>
+        <div className="grid grid-cols-2 gap-4">
 
-        <Button onClick={() => router.navigate({ to: "/items" })}>
-          Back
-        </Button>
-      </div>
+          {/* REQUIRED FIELDS */}
+          <Form.Item label="Item Name" name="itemName" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
 
-      <Card loading={loading} className="shadow rounded-xl">
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={onFinish}
-          initialValues={{
-            purchaseCost: 0,
-            salesPrice: 0,
-          }}
-        >
-          {/* FORM FIELDS */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Your fields remain identical */}
+          <Form.Item label="Item Code" name="itemCode" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+
+          <Form.Item label="Item Type" name="itemType" rules={[{ required: true }]}>
+            <Select>
+              {itemTypes.map((d) => (
+                <Option key={d.id} value={d.id}>{d.name}</Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item label="Unit" name="unitID" rules={[{ required: true }]}>
+            <Select>
+              {units.map((u) => (
+                <Option key={u.id} value={u.id}>{u.name}</Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item label="Brand" name="brandID">
+            <Select>
+              {brands.map((b) => (
+                <Option key={b.id} value={b.id}>{b.name}</Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item label="Department" name="itemDepartmentID">
+            <Select>
+              {departments.map((d) => (
+                <Option key={d.id} value={d.id}>{d.name}</Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item label="Category" name="itemCategoryID">
+            <Select>
+              {categories.map((c) => (
+                <Option key={c.id} value={c.id}>{c.name}</Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item label="SubCategory" name="itemSubCategoryID">
+            <Select>
+              {subCategories.map((s) => (
+                <Option key={s.id} value={s.id}>{s.name}</Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item label="Group" name="itemGroupID">
+            <Select>
+              {groups.map((g) => (
+                <Option key={g.id} value={g.id}>{g.name}</Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item label="Tax" name="taxID">
+            <Select>
+              {taxes.map((t) => (
+                <Option key={t.id} value={t.id}>{t.name}</Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item label="Supplier" name="supplierId">
+            <Select>
+              {suppliers.map((s) => (
+                <Option key={s.id} value={s.id}>{s.name}</Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item label="Purchase Cost" name="purchaseCost" rules={[{ required: true }]}>
+            <InputNumber min={0} className="w-full" />
+          </Form.Item>
+
+          <Form.Item label="Sales Price" name="salesPrice" rules={[{ required: true }]}>
+            <InputNumber min={0} className="w-full" />
+          </Form.Item>
+        </div>
+
+        {/* DETAILS TABLE */}
+        <div className="mt-6">
+          <div className="flex justify-between mb-2">
+            <h3 className="font-semibold">Item Unit Conversions</h3>
+            <Button size="small" onClick={addDetail}>Add Detail</Button>
           </div>
 
-          {/* DETAILS SECTION */}
-          <div className="mt-8">
-            <div className="flex justify-between items-center mb-2">
-              <h2 className="font-semibold text-lg">Item Details</h2>
-              <Button size="small" onClick={addDetail}>
-                Add Detail
-              </Button>
-            </div>
+          <Table
+            rowKey={(r) => r.id}
+            columns={columns}
+            dataSource={details}
+            pagination={false}
+            size="small"
+          />
+        </div>
 
-            <Table
-              rowKey={(r) => r.id}
-              columns={detailColumns}
-              dataSource={details}
-              pagination={false}
-              size="small"
-            />
-          </div>
+        {/* BUTTONS */}
+        <div className="mt-6 flex justify-end gap-2">
+          <Button onClick={() => router.navigate({ to: "/items" })}>
+            Cancel
+          </Button>
 
-          {/* ACTIONS */}
-          <div className="mt-6 flex justify-end gap-2">
-            <Button onClick={() => router.navigate({ to: "/items" })}>
-              Cancel
-            </Button>
-
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={saveMutation.isPending}
-            >
-              {itemId ? "Update" : "Save"}
-            </Button>
-          </div>
-        </Form>
-      </Card>
-    </div>
+          <Button type="primary" htmlType="submit" loading={saveMutation.isPending}>
+            {itemId ? "Update" : "Save"}
+          </Button>
+        </div>
+      </Form>
+    </Card>
   );
 }

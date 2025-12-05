@@ -5,6 +5,7 @@ const api = axios.create({
   baseURL: "/api",
 });
 
+// attach token automatically
 api.interceptors.request.use((config) => {
   const token = useAuth.getState().token;
   if (token) {
