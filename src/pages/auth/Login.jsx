@@ -7,7 +7,6 @@ import { useNavigate } from "@tanstack/react-router";
 export default function LoginPage() {
   const navigate = useNavigate();
   const login = useAuth((s) => s.login);
-
   const [loading, setLoading] = useState(false);
 
   const onFinish = async (values) => {
@@ -33,21 +32,25 @@ export default function LoginPage() {
 
   return (
     <div
-      className="min-h-screen w-full flex items-center justify-center 
-      px-4 py-10
-      bg-linear-to-br from-black via-[#0a1627] to-[#12345a]"
+      className="
+        min-h-screen w-full flex items-center justify-center
+        px-4 py-10
+        bg-linear-to-br from-black via-[#0a1627] to-[#12345a]
+      "
     >
+      {/* CARD CONTAINER */}
       <div
         className="
-          w-full max-w-sm sm:max-w-md
+          w-full 
+          max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg
           bg-[#0c1627]/85 backdrop-blur-md
-          p-6 sm:p-8
+          p-6 sm:p-8 md:p-10
           rounded-2xl
           border border-pink-500/30
           shadow-[0_0_35px_rgba(255,20,120,0.35)]
         "
       >
-        {/* Title */}
+        {/* TITLE */}
         <h1
           className="
             text-center font-extrabold
@@ -61,8 +64,10 @@ export default function LoginPage() {
           Login
         </h1>
 
+        {/* FORM */}
         <Form layout="vertical" onFinish={onFinish} className="space-y-4">
-          {/* Username */}
+          
+          {/* USERNAME */}
           <Form.Item
             label={<span className="text-[#fdd6f4] text-sm sm:text-base">Username</span>}
             name="username"
@@ -79,7 +84,7 @@ export default function LoginPage() {
             />
           </Form.Item>
 
-          {/* Password */}
+          {/* PASSWORD */}
           <Form.Item
             label={<span className="text-[#fdd6f4] text-sm sm:text-base">Password</span>}
             name="password"
@@ -96,24 +101,26 @@ export default function LoginPage() {
             />
           </Form.Item>
 
-          {/* Button */}
+          {/* BUTTON (100% RESPONSIVE HEIGHT) */}
           <Button
             htmlType="submit"
             type="primary"
             loading={loading}
+            style={{ height: "48px" }} 
             className="
-              w-full py-2.5 sm:py-3
+              w-full
               bg-linear-to-r from-[#1b4d99] to-[#ff4fa3]
               hover:opacity-95
               border-none
               rounded-full
-              font-semibold text-lg
+              font-semibold text-lg sm:text-xl
               shadow-lg shadow-pink-600/40
               transition-all duration-300
             "
           >
             Login
           </Button>
+
         </Form>
       </div>
     </div>
